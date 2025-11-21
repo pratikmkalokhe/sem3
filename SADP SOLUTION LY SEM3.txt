@@ -1,0 +1,1135 @@
+Slip 2
+
+//Q.1 Write a Java Program to implement Singleton pattern for multithreading.
+
+import java.lang.*;
+class ThreadSafeSingleton extends Thread
+{
+    //Thread Safe Singleton
+    private static ThreadSafeSingleton instance;
+
+    private ThreadSafeSingleton()
+    {
+        System.out.println("Singleton object created using Threads Synchronized Method");
+    }
+
+    //Making the getInstance method as synchronized
+    public static synchronized ThreadSafeSingleton getInstance()
+    {
+        if(instance == null)
+        {
+            instance = new ThreadSafeSingleton();
+        }
+        return instance;
+    }
+}
+
+class s2q1
+{
+    public static void main(String args[])
+    {
+        ThreadSafeSingleton ob = ThreadSafeSingleton.getInstance();
+    }
+}
+
+
+
+
+Slip 3
+
+//Q.1 Write a JAVA Program to implement built-in support (java.util.Observable) Weather station with members temperature, humidity, pressure and methods mesurmentsChanged(), setMesurment(), getTemperature(), getHumidity(), getPressure().
+
+import java.util.Observable;
+import java.util.Observer;
+
+class WeatherData extends Observable
+{
+    private float temperature;
+    private float humidity;
+    private float pressure;
+
+    public WeatherData()
+    { }
+
+    public void measurementsChanged()
+    {
+        setChanged();
+        notifyObservers();
+    }
+
+    public void setMeasurements(float temperature, float humidity, float pressure)
+    {
+        this.temperature = temperature;
+        this.humidity = humidity;
+        this.pressure = pressure;
+        measurementsChanged();
+    }
+
+    public float getTemperature()
+    {
+        return temperature;
+    }
+
+    public float getHumidity()
+    {
+        return humidity;
+    }
+
+    public float getPressure()
+    {
+        return pressure;
+    }
+}
+
+class CurrentConditionsDisplay implements Observer
+{
+    Observable observable;
+    private float temperature;
+    private float humidity;
+    private float pressure;
+
+    public CurrentConditionsDisplay(Observable observable)
+    {
+        this.observable = observable;
+        observable.addObserver(this);
+    }
+
+    public void update(Observable obs, Object arg)
+    {
+        if (obs instanceof WeatherData)
+        {
+            WeatherData weatherData = (WeatherData) obs;
+            this.temperature = weatherData.getTemperature();
+            this.humidity = weatherData.getHumidity();
+            this.pressure = weatherData.getPressure();
+            display();
+        }
+    }
+
+    public void display()
+    {
+        System.out.println("Current conditions:" + temperature + "F degrees and "
+                + humidity + " %humidity & pressure " + pressure);
+    }
+}
+
+class s3q1
+{
+    public static void main(String args[])
+    {
+        WeatherData ob = new WeatherData();
+        CurrentConditionsDisplay cd = new CurrentConditionsDisplay(ob);
+        ob.setMeasurements(30, 100, 30);
+        ob.setMeasurements(40, 140, 50);
+    }
+}
+
+
+
+
+Slip 4
+
+//Q.1 Write a Java Program to implement Factory method for Pizza Store with createPizza(), orederPizza(), prepare(), Bake(), cut(), box(). Use this to create variety of pizza’s like NyStyleCheesePizza, ChicagoStyleCheesePizza etc.
+
+import java.util.*;
+interface PizzaStore
+{
+    public void createPizza();
+    public void orederPizza();
+    public void prepare();
+    public void Bake();
+    public void cut();
+    public void box();
+}
+
+class NyStyleCheesePizza implements PizzaStore
+{
+    public void createPizza()
+    {
+        System.out.println("Creating Pizza in NYStyle");
+    }
+    public void orederPizza()
+    {
+        System.out.println("Creating Pizza in NYStyle");
+    }
+    public void prepare()
+    {
+        System.out.println("Prepare Pizza in NYStyle");
+    }
+    public void Bake()
+    {
+        System.out.println("Bake Pizza for 10 Minutes");
+    }
+    public void cut()
+    {
+        System.out.println("Cut Pizza in NYStyle Diamond");
+    }
+    public void box()
+    {
+        System.out.println("Pack Pizza in NY Box");
+    }
+}
+
+class ChicagoStyleCheesePizza implements PizzaStore
+{
+    public void createPizza()
+    {
+        System.out.println("Creating Pizza in ChicagoStyle");
+    }
+    public void orederPizza()
+    {
+        System.out.println("Ordering Pizza in ChicagoStyle");
+    }
+    public void prepare()
+    {
+        System.out.println("Prepare Pizza in ChicagoStyle");
+    }
+    public void Bake()
+    {
+        System.out.println("Bake Pizza for 15 Minutes");
+    }
+    public void cut()
+    {
+        System.out.println("Cut Pizza in ChicagoStyle Triangle");
+    }
+    public void box()
+    {
+        System.out.println("Pack Pizza in Chicago Box");
+    }
+}
+
+class PizzaFactory
+{
+    public PizzaStore getPizza(String pizzatype)
+    {
+        if(pizzatype.equals("NY"))
+        {
+            return new NyStyleCheesePizza();
+        }
+        if(pizzatype.equals("Chicago"))
+        {
+            return new ChicagoStyleCheesePizza();
+        }
+        return null;
+    }
+}
+
+class s4q1
+{
+    public static void main(String args[])
+    {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter Type of Pizza you want (NY / Chicago)");
+
+        String sn = sc.next();
+        PizzaFactory factory = new PizzaFactory();
+        PizzaStore ob = factory.getPizza(sn);
+        ob.createPizza(); ob.prepare(); ob.Bake(); ob.cut(); ob.box();
+    }
+}
+
+
+
+
+Slip 6
+
+//Q.1 Write a Java Program to implement command pattern to test Remote Control.
+
+interface Command
+{
+    public void execute();
+}
+
+class Remote
+{
+    public void working() {
+        System.out.println("Remote is Working");
+    }
+    public void notWorking() {
+        System.out.println("Remote is Not Working");
+    }
+}
+
+class WorkingRemote implements Command {
+    Remote r1;
+    public WorkingRemote(Remote a) {
+        this.r1 = a;
+    }
+    public void execute() {
+        r1.working();
+    }
+}
+
+class NotWorkingRemote implements Command {
+    Remote r1;
+    public NotWorkingRemote(Remote a) {
+        this.r1 = a;
+    }
+    public void execute() {
+        r1.notWorking();
+    }
+}
+
+class SimpleRemoteControl {
+    Command c;
+    public SimpleRemoteControl()
+    {
+    }
+    public void setCommand(Command command) {
+        c = command;
+    }
+    public void buttonWasPressed() {
+        c.execute();
+    }
+}
+
+public class s6q1 {
+    public static void main(String[] args) {
+        SimpleRemoteControl r1 = new SimpleRemoteControl();
+        Remote r = new Remote();
+
+        WorkingRemote wr = new WorkingRemote(r);
+        r1.setCommand(wr);
+        r1.buttonWasPressed();
+
+        NotWorkingRemote nwr = new NotWorkingRemote(r);
+        r1.setCommand(nwr);
+        r1.buttonWasPressed();
+    }
+}
+
+
+
+
+Slip 7
+
+//Q.1 Write a Java Program to implement undo command to test Ceiling fan.
+
+interface Command
+{
+    public void execute();
+}
+
+class Fan
+{
+    public void working() {
+        System.out.println("Fan is Working");
+    }
+    public void notWorking() {
+        System.out.println("Fan is Not Working");
+    }
+}
+
+class WorkingFan implements Command {
+    Fan r1;
+    public WorkingFan(Fan a) {
+        this.r1 = a;
+    }
+    public void execute() {
+        r1.working();
+    }
+}
+
+class NotWorkingFan implements Command {
+    Fan r1;
+    public NotWorkingFan(Fan a) {
+        this.r1 = a;
+    }
+    public void execute() {
+        r1.notWorking();
+    }
+}
+
+class SimpleFanControl {
+    Command c;
+    public SimpleFanControl()
+    {
+    }
+    public void setCommand(Command command) {
+        c = command;
+    }
+
+    public void buttonWasPressed() {
+        c.execute();
+    }
+}
+
+public class s7q1 {
+    public static void main(String[] args) {
+        SimpleFanControl r1 = new SimpleFanControl();
+        Fan r = new Fan();
+
+        WorkingFan wr = new WorkingFan(r);
+        r1.setCommand(wr);
+        r1.buttonWasPressed();
+
+        NotWorkingFan nwr = new NotWorkingFan(r);
+        r1.setCommand(nwr);
+        r1.buttonWasPressed();
+    }
+}
+
+
+
+
+Slip 9
+Change the slip.
+
+
+
+
+Slip 10
+
+//Q.1 Write a Java Program to implement Strategy Pattern for Duck Behavior. Create instance variable that holds current state of Duck from there, we just need to handle all Flying Behaviors and Quack Behavior.
+
+interface Strategy
+{
+    public String duckBehavior (String b);
+}
+
+class FlyingBehavior implements Strategy
+{
+    public String duckBehavior (String b)
+    {
+        return "Look Duck is "+b;
+    }
+}
+
+class QuackBehavior implements Strategy
+{
+    public String duckBehavior (String b)
+    {
+        return "Real Duck says "+b;
+    }
+}
+
+class Context
+{
+    private Strategy strategy;
+
+    public Context (Strategy strategy)
+    {
+        this.strategy= strategy;
+    }
+
+    public String executeStrategy (String b)
+    {
+        return strategy.duckBehavior(b);
+    }
+}
+
+class s10q1
+{
+    public static void main(String[] args)
+    {
+        Context context= new Context (new FlyingBehavior());
+        System.out.println("Who Flies "+ context.executeStrategy ("Flying"));
+        context =new Context (new QuackBehavior());
+        System.out.println("Who says Quack?"+context.executeStrategy ("Quack"));
+    }
+}
+
+
+
+
+Slip 11
+
+//Q.1 Write a java program to implement Adapter pattern to design Heart Model to Beat Model.
+
+// BeatModel Interface
+interface BeatModel {
+    void start();
+    void stop();
+    int getRate();
+}
+
+// HeartModel Class
+class HeartModel {
+    private int heartRate;
+
+    public HeartModel(int initialRate) {
+        this.heartRate = initialRate;
+    }
+
+    public void beginBeat() {
+        System.out.println("Heart is beating...");
+    }
+
+    public void haltBeat() {
+        System.out.println("Heart has stopped beating.");
+    }
+
+    public int getHeartRate() {
+        return heartRate;
+    }
+
+    public void setHeartRate(int rate) {
+        this.heartRate = rate;
+    }
+}
+
+// Adapter Class to Adapt HeartModel to BeatModel
+class HeartToBeatAdapter implements BeatModel {
+    private final HeartModel heartModel;
+
+    public HeartToBeatAdapter(HeartModel heartModel) {
+        this.heartModel = heartModel;
+    }
+
+    @Override
+    public void start() {
+        heartModel.beginBeat();
+    }
+
+    @Override
+    public void stop() {
+        heartModel.haltBeat();
+    }
+
+    @Override
+    public int getRate() {
+        return heartModel.getHeartRate();
+    }
+}
+
+// Main Class to Test the Adapter
+public class s11q1 {
+    public static void main(String[] args) {
+        // Create a HeartModel instance
+        HeartModel heart = new HeartModel(72);
+
+        // Use HeartToBeatAdapter to adapt HeartModel to BeatModel interface
+        BeatModel beatModel = new HeartToBeatAdapter(heart);
+
+        // Test the adapted model
+        System.out.println("Starting the beat model:");
+        beatModel.start();
+        System.out.println("Current rate: " + beatModel.getRate() + " beats per minute");
+        
+        // Change heart rate and check it again
+        heart.setHeartRate(80);
+        System.out.println("New rate after adjustment: " + beatModel.getRate() + " beats per minute");
+
+        System.out.println("Stopping the beat model:");
+        beatModel.stop();
+    }
+}
+
+
+
+
+Slip 13
+
+//Q.1 Write a Java Program to implement an Adapter design pattern in mobile charger. Define two classes – Volt (to measure volts) and Socket (producing constant volts of 120V). Build an adapter that can produce 3 volts, 12 volts and default 120 volts. Implements Adapter pattern using Class Adapter.
+
+// Volt Class to represent voltage levels
+class Volt {
+    private int volts;
+
+    public Volt(int volts) {
+        this.volts = volts;
+    }
+
+    public int getVolts() {
+        return volts;
+    }
+
+    public void setVolts(int volts) {
+        this.volts = volts;
+    }
+}
+
+// Socket Class to produce constant 120 volts
+class Socket {
+    public Volt getVolt() {
+        return new Volt(120);
+    }
+}
+
+// Adapter Interface to get different voltage levels
+interface SocketAdapter {
+    Volt get3Volt();
+    Volt get12Volt();
+    Volt get120Volt();
+}
+
+// Class Adapter Implementation
+class SocketClassAdapterImpl extends Socket implements SocketAdapter {
+
+    @Override
+    public Volt get3Volt() {
+        return convertVolt(getVolt(), 40); // 120V / 40 = 3V
+    }
+
+    @Override
+    public Volt get12Volt() {
+        return convertVolt(getVolt(), 10); // 120V / 10 = 12V
+    }
+
+    @Override
+    public Volt get120Volt() {
+        return getVolt(); // 120V as is
+    }
+
+    // Helper method to convert voltage
+    private Volt convertVolt(Volt v, int divisor) {
+        return new Volt(v.getVolts() / divisor);
+    }
+}
+
+// Test the Adapter
+public class s13q1 {
+    public static void main(String[] args) {
+        SocketAdapter socketAdapter = new SocketClassAdapterImpl();
+
+        Volt v3 = socketAdapter.get3Volt();
+        Volt v12 = socketAdapter.get12Volt();
+        Volt v120 = socketAdapter.get120Volt();
+
+        System.out.println("3 volts using Adapter: " + v3.getVolts() + "V");
+        System.out.println("12 volts using Adapter: " + v12.getVolts() + "V");
+        System.out.println("120 volts using Adapter: " + v120.getVolts() + "V");
+    }
+}
+
+
+
+
+Slip 14
+
+//Q.1 Write a Java Program to implement Command Design Pattern for Command Interface with execute() . Use this to create variety of commands for LightOnCommand, LightOffCommand, GarageDoorUpCommand, StereoOnWithCDComman.
+
+// Command Interface
+interface Command {
+    void execute();
+}
+
+// Receiver Classes
+class Light {
+    public void on() {
+        System.out.println("Light is ON");
+    }
+
+    public void off() {
+        System.out.println("Light is OFF");
+    }
+}
+
+class GarageDoor {
+    public void up() {
+        System.out.println("Garage Door is UP");
+    }
+
+    public void down() {
+        System.out.println("Garage Door is DOWN");
+    }
+}
+
+class Stereo {
+    public void on() {
+        System.out.println("Stereo is ON");
+    }
+
+    public void off() {
+        System.out.println("Stereo is OFF");
+    }
+
+    public void setCD() {
+        System.out.println("Stereo is set to CD mode");
+    }
+
+    public void setVolume(int volume) {
+        System.out.println("Stereo volume set to " + volume);
+    }
+}
+
+// Concrete Command Classes
+class LightOnCommand implements Command {
+    private Light light;
+
+    public LightOnCommand(Light light) {
+        this.light = light;
+    }
+
+    @Override
+    public void execute() {
+        light.on();
+    }
+}
+
+class LightOffCommand implements Command {
+    private Light light;
+
+    public LightOffCommand(Light light) {
+        this.light = light;
+    }
+
+    @Override
+    public void execute() {
+        light.off();
+    }
+}
+
+class GarageDoorUpCommand implements Command {
+    private GarageDoor garageDoor;
+
+    public GarageDoorUpCommand(GarageDoor garageDoor) {
+        this.garageDoor = garageDoor;
+    }
+
+    @Override
+    public void execute() {
+        garageDoor.up();
+    }
+}
+
+class StereoOnWithCDCommand implements Command {
+    private Stereo stereo;
+
+    public StereoOnWithCDCommand(Stereo stereo) {
+        this.stereo = stereo;
+    }
+
+    @Override
+    public void execute() {
+        stereo.on();
+        stereo.setCD();
+        stereo.setVolume(11);
+    }
+}
+
+// Invoker Class
+class RemoteControl {
+    private Command command;
+
+    public void setCommand(Command command) {
+        this.command = command;
+    }
+
+    public void pressButton() {
+        command.execute();
+    }
+}
+
+// Test the Command Pattern
+public class s14q1 {
+    public static void main(String[] args) {
+        // Receivers
+        Light light = new Light();
+        GarageDoor garageDoor = new GarageDoor();
+        Stereo stereo = new Stereo();
+
+        // Command Instances
+        Command lightOn = new LightOnCommand(light);
+        Command lightOff = new LightOffCommand(light);
+        Command garageDoorUp = new GarageDoorUpCommand(garageDoor);
+        Command stereoOnWithCD = new StereoOnWithCDCommand(stereo);
+
+        // Invoker
+        RemoteControl remote = new RemoteControl();
+
+        // Execute Commands
+        remote.setCommand(lightOn);
+        remote.pressButton();
+
+        remote.setCommand(lightOff);
+        remote.pressButton();
+
+        remote.setCommand(garageDoorUp);
+        remote.pressButton();
+
+        remote.setCommand(stereoOnWithCD);
+        remote.pressButton();
+    }
+}
+
+
+
+
+Slip 15
+
+//Q.1 Write a Java Program to implement Facade Design Pattern for Home Theater.
+
+// Subsystem Classes
+
+class Projector {
+    public void on() {
+        System.out.println("Projector is ON");
+    }
+
+    public void off() {
+        System.out.println("Projector is OFF");
+    }
+
+    public void setInput(String input) {
+        System.out.println("Projector input set to " + input);
+    }
+}
+
+class Screen {
+    public void down() {
+        System.out.println("Screen is DOWN");
+    }
+
+    public void up() {
+        System.out.println("Screen is UP");
+    }
+}
+
+class Lights {
+    public void dim(int level) {
+        System.out.println("Lights dimmed to " + level + "%");
+    }
+
+    public void on() {
+        System.out.println("Lights are ON");
+    }
+}
+
+class SoundSystem {
+    public void on() {
+        System.out.println("SoundSystem is ON");
+    }
+
+    public void off() {
+        System.out.println("SoundSystem is OFF");
+    }
+
+    public void setVolume(int level) {
+        System.out.println("SoundSystem volume set to " + level);
+    }
+}
+
+class DVDPlayer {
+    public void on() {
+        System.out.println("DVD Player is ON");
+    }
+
+    public void off() {
+        System.out.println("DVD Player is OFF");
+    }
+
+    public void play(String movie) {
+        System.out.println("Playing movie: " + movie);
+    }
+
+    public void stop() {
+        System.out.println("Stopping movie");
+    }
+
+    public void eject() {
+        System.out.println("Ejecting DVD");
+    }
+}
+
+// Facade Class
+class HomeTheaterFacade {
+    private Projector projector;
+    private Screen screen;
+    private Lights lights;
+    private SoundSystem soundSystem;
+    private DVDPlayer dvdPlayer;
+
+    public HomeTheaterFacade(Projector projector, Screen screen, Lights lights, SoundSystem soundSystem, DVDPlayer dvdPlayer) {
+        this.projector = projector;
+        this.screen = screen;
+        this.lights = lights;
+        this.soundSystem = soundSystem;
+        this.dvdPlayer = dvdPlayer;
+    }
+
+    public void watchMovie(String movie) {
+        System.out.println("Setting up to watch a movie...");
+        
+        lights.dim(10);
+        screen.down();
+        projector.on();
+        projector.setInput("DVD");
+        soundSystem.on();
+        soundSystem.setVolume(15);
+        dvdPlayer.on();
+        dvdPlayer.play(movie);
+
+        System.out.println("Movie started! Enjoy!");
+    }
+
+    public void endMovie() {
+        System.out.println("Shutting down the home theater...");
+
+        dvdPlayer.stop();
+        dvdPlayer.eject();
+        dvdPlayer.off();
+        soundSystem.off();
+        projector.off();
+        screen.up();
+        lights.on();
+
+        System.out.println("Home theater shut down.");
+    }
+}
+
+// Client Code
+public class s15q1 {
+    public static void main(String[] args) {
+        // Instantiate components
+        Projector projector = new Projector();
+        Screen screen = new Screen();
+        Lights lights = new Lights();
+        SoundSystem soundSystem = new SoundSystem();
+        DVDPlayer dvdPlayer = new DVDPlayer();
+
+        // Create Facade
+        HomeTheaterFacade homeTheater = new HomeTheaterFacade(projector, screen, lights, soundSystem, dvdPlayer);
+
+        // Use Facade to watch a movie
+        homeTheater.watchMovie("Inception");
+        
+        // End movie
+        homeTheater.endMovie();
+    }
+}
+
+
+
+
+Slip 17
+
+//Q.1 Write a Java Program to implement Abstract Factory Pattern for Shape interface.
+
+// Shape Interface
+interface Shape {
+    void draw();
+}
+
+// Concrete Shape Classes
+class Circle implements Shape {
+    @Override
+    public void draw() {
+        System.out.println("Drawing a Circle");
+    }
+}
+
+class Rectangle implements Shape {
+    @Override
+    public void draw() {
+        System.out.println("Drawing a Rectangle");
+    }
+}
+
+class Square implements Shape {
+    @Override
+    public void draw() {
+        System.out.println("Drawing a Square");
+    }
+}
+
+// Abstract Factory
+interface AbstractFactory {
+    Shape createShape(String shapeType);
+}
+
+// Factory for 2D Shapes
+class Shape2DFactory implements AbstractFactory {
+    @Override
+    public Shape createShape(String shapeType) {
+        if (shapeType == null) {
+            return null;
+        }
+        switch (shapeType.toLowerCase()) {
+            case "circle":
+                return new Circle();
+            case "rectangle":
+                return new Rectangle();
+            case "square":
+                return new Square();
+            default:
+                return null;
+        }
+    }
+}
+
+// Factory for 3D Shapes (as an example)
+class Shape3DFactory implements AbstractFactory {
+    @Override
+    public Shape createShape(String shapeType) {
+        // We could add 3D shapes here in the future.
+        System.out.println("3D Shape creation not implemented.");
+        return null;
+    }
+}
+
+// Factory Producer to get factories
+class FactoryProducer {
+    public static AbstractFactory getFactory(String factoryType) {
+        if (factoryType == null) {
+            return null;
+        }
+        switch (factoryType.toLowerCase()) {
+            case "2d":
+                return new Shape2DFactory();
+            case "3d":
+                return new Shape3DFactory();
+            default:
+                return null;
+        }
+    }
+}
+
+// Client Code
+public class s17q1 {
+    public static void main(String[] args) {
+        // Get 2D Shape Factory
+        AbstractFactory shapeFactory = FactoryProducer.getFactory("2d");
+
+        // Create and draw 2D shapes
+        Shape circle = shapeFactory.createShape("circle");
+        circle.draw();
+
+        Shape rectangle = shapeFactory.createShape("rectangle");
+        rectangle.draw();
+
+        Shape square = shapeFactory.createShape("square");
+        square.draw();
+    }
+}
+
+
+
+
+Slip 18
+
+//Q.1 Write a JAVA Program to implement built-in support (java.util.Observable) Weather station with members temperature, humidity, pressure and methods mesurmentsChanged(), setMesurment(), getTemperature(), getHumidity(), getPressure().
+
+import java.util.Observable;
+import java.util.Observer;
+
+class WeatherData extends Observable
+{
+    private float temperature;
+    private float humidity;
+    private float pressure;
+
+    public WeatherData()
+    { }
+
+    public void measurementsChanged()
+    {
+        setChanged();
+        notifyObservers();
+    }
+
+    public void setMeasurements (float temperature, float humidity, float pressure)
+    {
+        this.temperature = temperature;
+        this.humidity = humidity;
+        this.pressure = pressure;
+        measurementsChanged();
+    }
+
+    public float getTemperature ()
+    {
+        return temperature;
+    }
+
+    public float getHumidity()
+    {
+        return humidity;
+    }
+
+    public float getPressure ()
+    {
+        return pressure;
+    }
+}
+
+class CurrentConditionsDisplay implements Observer
+{
+    Observable observable;
+    private float temperature;
+
+    private float humidity;
+    private float pressure;
+
+    public CurrentConditionsDisplay (Observable observable)
+    {
+        this.observable = observable;
+        observable.addObserver(this);
+    }
+
+    public void update (Observable obs, Object arg)
+    {
+        if (obs instanceof WeatherData)
+        {
+            WeatherData weatherData = (WeatherData) obs;
+            this.temperature = weatherData.getTemperature();
+            this.humidity = weatherData.getHumidity();
+            this.pressure = weatherData.getPressure();
+            display();
+        }
+    }
+
+    public void display ()
+    {
+        System.out.println("Current conditions:" + temperature + "F degrees and "
+                + humidity + " %humidity & pressure " + pressure);
+    }
+}
+
+class s18q1
+{
+    public static void main(String args[])
+    {
+        WeatherData ob = new WeatherData();
+        CurrentConditionsDisplay cd = new CurrentConditionsDisplay(ob);
+        ob.setMeasurements(30, 100, 30);
+        ob.setMeasurements(40, 140, 50);
+    }
+}
+
+
+
+
+Slip 20
+
+//Q.1 Write a Java Program to implement I/O Decorator for converting uppercase letters to lower case letters.
+
+import java.io.*;
+import java.util.*;
+
+class LowerCaseInputStream extends FilterInputStream {
+    public LowerCaseInputStream(InputStream in) {
+        super(in);
+    }
+
+    public int read() throws IOException {
+        int c = super.read();
+        return (c == -1 ? c : Character.toLowerCase((char) c));
+    }
+
+    public int read(byte[] b, int offset, int len) throws IOException {
+        int result = super.read(b, offset, len);
+        for (int i = offset; i < offset + result; i++) {
+            b[i] = (byte) Character.toLowerCase((char) b[i]);
+        }
+        return result;
+    }
+}
+
+public class s20q1 {
+    public static void main(String[] args) throws IOException {
+        int c;
+        try {
+            InputStream in = new LowerCaseInputStream(
+                    new BufferedInputStream(
+                            new FileInputStream("test.txt")));
+            while ((c = in.read()) >= 0) {
+                System.out.print((char) c);
+            }
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+Make a another TXT file in that file write HELLO!

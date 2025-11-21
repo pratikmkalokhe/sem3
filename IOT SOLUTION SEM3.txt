@@ -1,0 +1,479 @@
+Slip 2
+
+Q.2 Write a program to measure the distance using ultrasonic sensor and make LED blink using Arduino.
+
+const int trigPin = 9;
+const int echoPin = 10;
+const int ledPin  = 13;
+
+long duration;
+float distance;
+
+void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * 0.034 / 2; // in cm
+
+  if (distance < 20) {
+    digitalWrite(ledPin, HIGH);
+  } else {
+    digitalWrite(ledPin, LOW);
+  }
+
+  Serial.print("Distance: ");
+  Serial.println(distance);
+  
+  delay(200);
+}
+
+
+
+
+Slip 3
+
+Q. 2 Write a program to detects the vibration of an object with sensor using Arduino.
+
+// Interrupt-based vibration detection (with SPST switch in Proteus)
+
+const byte vibPin = 2;        // interrupt pin (INT0)
+const byte ledPin = 13;       // LED indicator
+
+volatile bool vibDetected = false;
+volatile unsigned long lastTriggerTime = 0;
+const unsigned long debounceDelay = 80; // ms to prevent double triggers
+
+// Interrupt Service Routine
+void vibrationISR() {
+  unsigned long current = millis();
+
+  // Debounce: ignore triggers happening too close
+  if (current - lastTriggerTime > debounceDelay) {
+    vibDetected = true;
+    lastTriggerTime = current;
+  }
+}
+
+void setup() {
+  pinMode(vibPin, INPUT);   // if needed: INPUT_PULLUP
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+
+  // Attach interrupt on rising edge (switch ON = vibration)
+  attachInterrupt(digitalPinToInterrupt(vibPin), vibrationISR, RISING);
+
+  Serial.println("Vibration detector ready...");
+}
+
+void loop() {
+  if (vibDetected) {
+    vibDetected = false;
+
+    Serial.println("VIBRATION DETECTED!");
+
+    // Blink LED quickly to show interrupt fired
+    for (int i = 0; i < 3; i++) {
+      digitalWrite(ledPin, HIGH);
+      delay(80);
+      digitalWrite(ledPin, LOW);
+      delay(80);
+    }
+  }
+}
+
+
+
+
+Slip 4
+
+Q.2 Write a program to sense a finger when it is placed on the board Arduino.
+
+// Finger-touch (simulated) using interrupt on D2 (UNO)
+// Works with SW-SPST between +5V and D2 and a 10k pull-down to GND.
+
+const byte touchPin = 2;   // INT0 on UNO
+const byte ledPin   = 13;
+
+volatile bool touched = false;
+volatile unsigned long lastInterrupt = 0;
+const unsigned long debounceMs = 80; // debounce time
+
+// Plain ISR for AVR (no IRAM_ATTR)
+void touchISR() {
+  unsigned long now = millis();
+  if (now - lastInterrupt > debounceMs) {
+    touched = true;
+    lastInterrupt = now;
+  }
+}
+
+void setup() {
+  pinMode(touchPin, INPUT);    // using external 10k pull-down resistor
+  pinMode(ledPin, OUTPUT);
+  attachInterrupt(digitalPinToInterrupt(touchPin), touchISR, RISING);
+  Serial.begin(9600);
+  Serial.println("Ready");
+}
+
+void loop() {
+  if (touched) {
+    touched = false;
+    Serial.println("Touch detected!");
+    digitalWrite(ledPin, HIGH);
+    delay(200);
+    digitalWrite(ledPin, LOW);
+  }
+}
+
+
+
+
+Slip 6
+
+Q.2 Write a program to get temperature notification using Arduino.
+
+#include <DHT.h>
+
+#define DHTPIN 2       // DHT11 data pin connected to D2
+#define DHTTYPE DHT11  // Sensor type
+
+DHT dht(DHTPIN, DHTTYPE);
+
+const int ledPin = 13;     // LED pin
+const float threshold = 30.0; // Temperature limit in °C
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(ledPin, OUTPUT);
+  dht.begin();
+}
+
+void loop() {
+  float temp = dht.readTemperature(); // read temp in Celsius
+
+  if (isnan(temp)) {
+    Serial.println("Sensor Error! Check wiring...");
+    return;
+  }
+
+  Serial.print("Temperature: ");
+  Serial.print(temp);
+  Serial.println(" °C");
+
+  // Notification logic
+  if (temp >= threshold) {
+    digitalWrite(ledPin, HIGH);   // LED turns ON when too hot
+    Serial.println("⚠ HIGH Temperature Warning!");
+  } else {
+    digitalWrite(ledPin, LOW);    // LED OFF
+  }
+
+  delay(1500); // read every 1.5 seconds
+}
+
+
+
+
+Slip 7
+
+Q.2 Write a program for LDR to vary the light intensity of LED using Arduino.
+
+const int ldrPin = A0;
+const int ledPin = 9;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+
+  int ldrValue = analogRead(ldrPin);   // 0 to 1023
+  int brightness = map(ldrValue, 0, 1023, 255, 0);
+
+  analogWrite(ledPin, brightness);
+
+  Serial.print("LDR: ");
+  Serial.print(ldrValue);
+  Serial.print("  LED Brightness: ");
+  Serial.println(brightness);
+
+  delay(50);
+}
+
+
+
+
+Slip 9
+
+Q.2 Write python programs on Pi :
+a) Read your name and print Hello message with name.
+b) Read two numbers and print their sum, difference, product and division.
+c) Word and character count of a given string.
+d) Area of a given shape (rectangle, triangle and circle) reading shape and appropriate values from standard input.
+
+(a) Read your name and print Hello message.
+
+name = input("Enter your name: ")
+print("Hello", name)
+
+#Run by python s9q1.py
+
+(b) Read two numbers and print sum, difference, product, division.
+
+a = float(input("Enter first number: "))
+b = float(input("Enter second number: "))
+
+print("Sum =", a + b)
+print("Difference =", a - b)
+print("Product =", a * b)
+
+if b != 0:
+    print("Division =", a / b)
+else:
+    print("Division not possible (cannot divide by zero)")
+
+#Run by python s9q2.py
+
+(c) Word and character count of a given string.
+
+text = input("Enter a string: ")
+
+word_count = len(text.split())
+char_count = len(text)
+
+print("Number of words =", word_count)
+print("Number of characters =", char_count)
+
+#Run by python s9q3.py
+
+(d) Area of a shape (rectangle, triangle, circle).
+
+shape = input("Enter shape (rectangle/triangle/circle): ").lower()
+
+if shape == "rectangle":
+    length = float(input("Enter length: "))
+    breadth = float(input("Enter breadth: "))
+    area = length * breadth
+    print("Area of rectangle =", area)
+
+elif shape == "triangle":
+    base = float(input("Enter base: "))
+    height = float(input("Enter height: "))
+    area = 0.5 * base * height
+    print("Area of triangle =", area)
+
+elif shape == "circle":
+    radius = float(input("Enter radius: "))
+    area = 3.14159 * radius * radius
+    print("Area of circle =", area)
+
+else:
+    print("Invalid shape entered")
+
+#Run by python s9q4.py
+
+
+
+
+Slip 10
+
+Q.2 Write python programs on Pi like:
+a) Print a name 'n' times, where name and n are read from standard input, using for and while loops.
+b) Handle Divided by Zero Exception.
+c) Print current time for 10 times with an interval of10seconds.
+d) Read a file-line byline and print the word count of each line.
+
+(a)
+# Using for loop
+name = input("Enter a name: ")
+n = int(input("Enter the number of times to print the name: "))
+
+print("\nUsing for loop:")
+for _ in range(n):
+    print(name)
+
+# Using while loop
+print("\nUsing while loop:")
+count = 0
+while count < n:
+    print(name)
+    count += 1
+
+(b)
+# Program to handle division by zero exception
+try:
+    num1 = float(input("Enter the numerator: "))
+    num2 = float(input("Enter the denominator: "))
+    result = num1 / num2
+    print(f"The result of division is: {result}")
+except ZeroDivisionError:
+    print("Error: Division by zero is not allowed.")
+
+(c)
+import time
+from datetime import datetime
+
+# Program to print current time 10 times with a 10-second interval
+print("Printing current time 10 times with a 10-second interval:")
+for _ in range(10):
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(current_time)
+    time.sleep(10)
+
+(d)
+# Program to read a file line by line and print the word count of each line
+filename = input("Enter the filename: ")
+
+try:
+    with open(filename, 'r') as file:
+        line_number = 1
+        for line in file:
+            words = line.split()
+            word_count = len(words)
+            print(f"Line {line_number}: {word_count} words")
+            line_number += 1
+except FileNotFoundError:
+    print("Error: The specified file was not found.")
+
+
+
+
+Slip 11
+
+Q.2 Run some python programs on Pi like:
+a) Light an LED through Python program.
+b) Get input from two switches and switch on corresponding LEDs.
+c) Flash an LED at a given on time and off time cycle, where the two times are taken from a file.
+
+#Q.2 (a) Light an LED through Python program.
+#sudo apt-get update
+#udo apt-get install python3-rpi.gpio
+
+import RPi.GPIO as GPIO
+import time
+
+# Use BCM pin numbering
+GPIO.setmode(GPIO.BCM)
+
+LED_PIN = 17
+GPIO.setup(LED_PIN, GPIO.OUT)
+
+print("LED is ON")
+GPIO.output(LED_PIN, GPIO.HIGH)
+
+time.sleep(5)    # keep LED ON for 5 seconds
+
+GPIO.output(LED_PIN, GPIO.LOW)
+GPIO.cleanup()
+
+#sudo python3 s11q1.py
+
+#Q.2 (b) Get input from two switches and switch on corresponding LEDs.
+#sudo apt-get update
+#sudo apt-get install python3-rpi.gpio
+
+import RPi.GPIO as GPIO
+import time
+
+GPIO.setmode(GPIO.BCM)
+
+LED1 = 17
+LED2 = 27
+SW1 = 22
+SW2 = 23
+
+GPIO.setup(LED1, GPIO.OUT)
+GPIO.setup(LED2, GPIO.OUT)
+GPIO.setup(SW1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(SW2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+print("Press switches...")
+
+try:
+    while True:
+        if GPIO.input(SW1) == GPIO.HIGH:
+            GPIO.output(LED1, GPIO.HIGH)
+        else:
+            GPIO.output(LED1, GPIO.LOW)
+
+        if GPIO.input(SW2) == GPIO.HIGH:
+            GPIO.output(LED2, GPIO.HIGH)
+        else:
+            GPIO.output(LED2, GPIO.LOW)
+
+        time.sleep(0.1)
+
+except KeyboardInterrupt:
+    GPIO.cleanup()
+
+#sudo python3 s11q2.py
+
+#Q.2 (c) Flash an LED at given ON and OFF time taken from a file.
+#sudo apt-get update
+#sudo apt-get install python3-rpi.gpio
+
+import RPi.GPIO as GPIO
+import time
+
+GPIO.setmode(GPIO.BCM)
+LED_PIN = 17
+GPIO.setup(LED_PIN, GPIO.OUT)
+
+# Read ON and OFF times from file
+with open("times.txt", "r") as f:
+    on_time = float(f.readline().strip())
+    off_time = float(f.readline().strip())
+
+print(f"Flashing LED: ON={on_time}s, OFF={off_time}s")
+
+try:
+    while True:
+        GPIO.output(LED_PIN, GPIO.HIGH)
+        time.sleep(on_time)
+        GPIO.output(LED_PIN, GPIO.LOW)
+        time.sleep(off_time)
+
+except KeyboardInterrupt:
+    GPIO.cleanup()
+
+#sudo python3 S11q3.py
+
+
+
+
+Slip 13
+-Same as S2 Q2.
+
+
+Slip 14
+-Same as S3 Q2.
+
+
+Slip 15
+-Same as S4 Q2.
+
+
+Slip 17
+-Same as S6 Q2.
+
+
+Slip 18
+-Same as S7 Q2.
+
+
+Slip 20
+-Same as S9 Q2.
+
