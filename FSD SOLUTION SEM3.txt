@@ -1,0 +1,1315 @@
+Slip 1
+
+Q.1) Write an AngularJS script for addition of two numbers using ng-init, ng-model & ng-bind. And also demonstrate ng-show, ng-disabled, ng-click directives on button component.
+
+1. s1q1.html
+
+<!DOCTYPE html>
+<html ng-app="AdditionApp">
+<head>
+    <title>AngularJS Addition Example</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+
+<body ng-controller="AdditionController" ng-init="num1=0; num2=0; result=0; showResult=false">
+
+    <h2>Simple Addition Calculator</h2>
+
+    <label>Number 1:</label>
+    <input type="number" ng-model="num1" />
+    <br><br>
+
+    <label>Number 2:</label>
+    <input type="number" ng-model="num2" />
+    <br><br>
+
+    <button ng-click="addNumbers()">
+        Add
+    </button>
+
+    <br><br>
+
+    <div ng-show="showResult">
+        <strong>Result:</strong> <span ng-bind="result"></span>
+    </div>
+
+    <script>
+        angular.module('AdditionApp', [])
+        .controller('AdditionController', function ($scope) {
+            $scope.addNumbers = function () {
+                $scope.result = $scope.num1 + $scope.num2;
+                $scope.showResult = true;
+            };
+        });
+    </script>
+
+</body>
+</html>
+
+-Run by go live.
+
+
+Q.2) Create a Node.js application that reads data from multiple files asynchronously using promises and async/await.
+
+-Create a new folder name as S1Q2 in that folder add File1.txt, File2.txt, File3.txt, file and readfiles.js code file.
+
+1. readfile.js
+
+const fs = require('fs').promises;
+const path = require('path');
+
+const files = ['file1.txt', 'file2.txt', 'file3.txt'];
+const dataDir = path.join(__dirname, 'data'); // files under data directory
+
+async function readFiles(fileList) {
+    try {
+        const readPromises = fileList.map(file =>
+            fs.readFile(path.join(dataDir, file), 'utf-8')
+        );
+
+        const contents = await Promise.all(readPromises);
+
+        contents.forEach((content, index) => {
+            console.log(` ${fileList[index]}:\n${content}\n`);
+        });
+
+    } catch (error) {
+        console.error(' Error reading files:', error.message);
+    }
+}
+
+readFiles(files);
+
+-Run by node readfile.js
+
+
+
+
+Slipe 2
+
+Q.1) Write an AngularJS script to print details of bank (bank name, MICR code, IFC code, address etc.) in tabular form using ng-repeat.
+
+1. s2q1.html
+
+<!DOCTYPE html>
+<html ng-app="BankApp">
+<head>
+    <title>Bank Details Table</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+
+<body ng-controller="BankController">
+    <h2>Bank Details</h2>
+
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>Bank Name</th>
+                <th>MICR Code</th>
+                <th>IFSC Code</th>
+                <th>Address</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr ng-repeat="bank in banks">
+                <td>{{ bank.name }}</td>
+                <td>{{ bank.micr }}</td>
+                <td>{{ bank.ifsc }}</td>
+                <td>{{ bank.address }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        angular.module('BankApp', [])
+            .controller('BankController', function ($scope) {
+                $scope.banks = [
+                    {
+                        name: 'State Bank of India',
+                        micr: '400002002',
+                        ifsc: 'SBIN0000300',
+                        address: 'Mumbai Main Branch, Mumbai'
+                    },
+                    {
+                        name: 'HDFC Bank',
+                        micr: '110240001',
+                        ifsc: 'HDFC0000001',
+                        address: 'Connaught Place, New Delhi'
+                    },
+                    {
+                        name: 'ICICI Bank',
+                        micr: '560229002',
+                        ifsc: 'ICIC0000031',
+                        address: 'MG Road, Bengaluru'
+                    }
+                ];
+            });
+    </script>
+
+</body>
+</html>
+
+-Run by go live.
+
+
+Q.2) Create a simple Angular application that fetches data from an API using Http Client. Implement an Observable to fetch data from an API endpoint.
+
+-Create a new folder name as S2Q2.
+
+-ng new fetch-api-demo
+-cd fetch-api-demo
+-ng generate service services/data
+-ng generate component components/data
+
+1. app.module.ts
+
+-Enable HttpClientModule to make HTTP requests.
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
+import { AppComponent } from './app.component';
+import { DataComponent } from './components/data/data.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    DataComponent
+  ],
+  imports: [
+    BrowserModule,
+    HttpClientModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+2. data.service.ts
+
+-Use HttpClient and Observable to fetch data from a free API (https://jsonplaceholder.typicode.com/posts).
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DataService {
+
+  private apiUrl = 'https://jsonplaceholder.typicode.com/posts';
+
+  constructor(private http: HttpClient) { }
+
+  getPosts(): Observable<any> {
+    // Observable returned from HttpClient
+    return this.http.get(this.apiUrl);
+  }
+}
+
+3. data.component.ts
+
+-Subscribe to the Observable to receive data.
+
+import { Component, OnInit } from '@angular/core';
+import { DataService } from '../../services/data.service';
+
+@Component({
+  selector: 'app-data',
+  templateUrl: './data.component.html',
+  styleUrls: ['./data.component.css']
+})
+export class DataComponent implements OnInit {
+  posts: any[] = [];
+
+  constructor(private dataService: DataService) {}
+
+  ngOnInit(): void {
+    this.dataService.getPosts().subscribe({
+      next: (data) => {
+        this.posts = data;
+      },
+      error: (err) => {
+        console.error('Error fetching data:', err);
+      }
+    });
+  }
+}
+
+4. data.component.html
+
+-Display the fetched data.
+
+<div class="container">
+  <h2>Posts from API</h2>
+  <ul>
+    <li *ngFor="let post of posts">
+      <strong>{{ post.id }}. {{ post.title }}</strong>
+      <p>{{ post.body }}</p>
+    </li>
+  </ul>
+</div>
+
+5. app.component.html
+
+-Add the data component selector.
+
+<app-data></app-data>
+
+-Run by ng serve.
+
+
+
+
+Slip 3
+
+Q.1) Write an AngularJS script to display list of games stored in an array on click ofbutton using ng-click and also demonstrate ng-init, ng-bind directive of AngularJS.
+
+1. s3q1.html
+
+<!DOCTYPE html>
+<html ng-app="GameApp">
+<head>
+    <title>Game List</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+
+<body ng-controller="GameController" ng-init="games=[]; showGames=false; heading='List of Games'">
+
+    <h2 ng-bind="heading"></h2>
+
+    <button ng-click="loadGames()">Show Games</button>
+
+    <ul ng-show="showGames">
+        <li ng-repeat="game in games">{{ game }}</li>
+    </ul>
+
+    <script>
+        angular.module('GameApp', [])
+        .controller('GameController', function($scope) {
+            $scope.loadGames = function() {
+                $scope.games = [
+                    'Chess',
+                    'Football',
+                    'Cricket',
+                    'Badminton',
+                    'Hockey',
+                    'Tennis'
+                ];
+                $scope.showGames = true;
+            };
+        });
+    </script>
+
+</body>
+</html>
+
+-Run by go live.
+
+
+Q.2) Find a company with a workforce greater than 30 in the array (use find by id method).
+
+1. s3q2.js
+
+// Define an array of company objects
+const companies = [
+    { id: 1, name: 'TechNova', workforce: 25 },
+    { id: 2, name: 'GreenSoft', workforce: 40 },
+    { id: 3, name: 'CloudCore', workforce: 18 },
+    { id: 4, name: 'DataForge', workforce: 55 }
+];
+
+// Use find() to locate the first company with workforce > 30
+const company = companies.find(c => c.workforce > 30);
+
+// Display the result
+if (company) {
+    console.log('Company with workforce > 30 found:');
+    console.log(`ID: ${company.id}`);
+    console.log(`Name: ${company.name}`);
+    console.log(`Workforce: ${company.workforce}`);
+} else {
+    console.log('No company found with workforce greater than 30.');
+}
+
+-Run by node S3Q2.js
+
+
+
+
+Slip 4
+
+Q.1) Fetch the details using ng-repeat in AngularJS.
+
+1. s4q1.html
+
+<!DOCTYPE html>
+<html ng-app="StudentApp">
+<head>
+    <title>Student Grades</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+
+<body ng-controller="StudentController" ng-init="students=[]; showTable=false; heading='Student Grade Report'">
+
+    <h2 ng-bind="heading"></h2>
+
+    <button ng-click="loadStudents()">Show Grades</button>
+
+    <table border="1" ng-show="showTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Subject</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr ng-repeat="student in students">
+                <td>{{ student.name }}</td>
+                <td>{{ student.subject }}</td>
+                <td>{{ student.grade }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        angular.module('StudentApp', [])
+        .controller('StudentController', function($scope) {
+
+            $scope.loadStudents = function() {
+                $scope.students = [
+                    { name: 'Aarav',  subject: 'Math',    grade: 'A' },
+                    { name: 'Isha',   subject: 'Science', grade: 'B+' },
+                    { name: 'Rohan',  subject: 'English', grade: 'A-' },
+                    { name: 'Sneha',  subject: 'History', grade: 'B' }
+                ];
+                $scope.showTable = true;
+            };
+
+        });
+    </script>
+
+</body>
+</html>
+
+-Run by go live.
+
+
+Q2. Express.js application to include middleware for parsing request bodies (e.g., JSON, form data) and validating input data. (POSTMAN)
+
+-Create a new folder name as S4Q2.
+
+-npm init -y
+-npm install express body-parser express-validator
+
+1. index.html
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Submit Form</title>
+</head>
+<body>
+  <h2>Submit User Data</h2>
+
+  <form action="http://localhost:3000/submit" method="POST">
+    <input type="text" name="name" placeholder="Name" required /><br /><br />
+    <input type="email" name="email" placeholder="Email" required /><br /><br />
+    <input type="number" name="age" placeholder="Age" required min="1" /><br /><br />
+    <button type="submit">Submit</button>
+  </form>
+
+  <p>When you submit, the server will respond with JSON (open DevTools → Network / Console to see response).</p>
+</body>
+</html>
+
+2. server.js
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const { body, validationResult } = require('express-validator');
+
+const app = express();
+const PORT = 3000;
+
+// Middleware to parse JSON and form data
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Sample POST route with validation
+app.post(
+  '/submit',
+  [
+    body('name')
+      .isLength({ min: 2 })
+      .withMessage('Name must be at least 2 characters'),
+    body('email').isEmail().withMessage('Invalid email address'),
+    body('age')
+      .isInt({ min: 1 })
+      .withMessage('Age must be a positive integer'),
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { name, email, age } = req.body;
+    res.json({
+      message: 'Data received successfully',
+      data: { name, email, age },
+    });
+  }
+);
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+
+-Run by server.js
+
+-Post request at http://localhost:3000/submit
+ | KEY   | VALUE                                   | DESCRIPTION                |
+ | ----- | --------------------------------------- | -------------------------- |
+ | name  | Rahul                                   | (min 2 chars)              |
+ | email | [rahul@test.com](mailto:rahul@test.com) | (must be valid email)      |
+ | age   | 22                                      | (must be positive integer) |
+
+-GET request at http://localhost:3000/submit/1
+
+-You see this.
+ name = Rahul
+ email = rahul@test.com
+ age = 22
+
+
+
+
+Slip 5
+
+Q.1) Create a simple Angular component that takes input data and displays it.
+
+-Create a new folder name as S5Q1.
+
+-npm install -g @angular/cli (if needed)
+-ng new my-app
+-cd my-app
+-ng generate component user-input
+
+1. user-input.component.ts
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-user-input',
+  templateUrl: './user-input.component.html'
+})
+export class UserInputComponent {
+  userName: string = '';
+}
+
+2. user-input.component.html
+
+<h2>Enter Your Name</h2>
+
+<input type="text" [(ngModel)]="userName" placeholder="Your name" />
+
+<p *ngIf="userName">Hello, {{ userName }}!</p>
+
+3. Enable FormsModule (IMPORTANT)
+
+Open app.module.ts and add FormsModule.
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+
+import { AppComponent } from './app.component';
+import { UserInputComponent } from './user-input/user-input.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    UserInputComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule {}
+
+4. Use the Component in app.component.html
+<app-user-input></app-user-input>
+
+-Run by ng serve
+
+
+Q.2) Implement a simple server using Node.js. (Not needed but it also run in POSTMAN)
+
+1. s5q2.js
+
+const http = require('http');
+
+// Create the server
+const server = http.createServer((req, res) => {
+    // Set response header
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    // Send response
+    res.end('Hello! This is a simple Node.js server.');
+});
+
+// Start listening on port 3000
+const PORT = 3000;
+server.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`);
+});
+
+-Run by node S5Q2.js
+
+-It can also run in postman.
+-You should see: Server is running at http://localhost:3000.
+-Open Postman: Click New → HTTP Request.
+-Set Method: GET.
+-Enter URL: http://localhost:3000.
+-Click SEND.
+-You will get this response: Hello! This is a simple Node.js server.
+
+
+
+
+Slip 6
+
+Q.1) Develop an Express.js application that defines routes for Create and Read operations on a resource (products). (POSTMAN)
+
+-Create a new folder name as S6Q1.
+
+-npm init -y
+-npm install express body-parser
+
+1. s6q1.js
+
+const express = require('express');
+const bodyParser = require('body-parser');
+
+const app = express();
+const PORT = 3000;
+
+app.use(bodyParser.json());
+
+let products = [];
+
+app.post('/products', (req, res) => {
+    const { name, price } = req.body;
+
+    if (!name || !price) {
+        return res.status(400).json({ error: 'Name and price are required.' });
+    }
+
+    const newProduct = {
+        id: products.length + 1,
+        name,
+        price
+    };
+
+    products.push(newProduct);
+
+    res.status(201).json({
+        message: 'Product created',
+        product: newProduct
+    });
+});
+
+app.get('/products', (req, res) => {
+    res.json(products);
+});
+
+app.get('/products/:id', (req, res) => {
+    const productId = parseInt(req.params.id);
+    const product = products.find(p => p.id === productId);
+
+    if (!product) {
+        return res.status(404).json({ error: 'Product not found.' });
+    }
+
+    res.json(product);
+});
+
+app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+});
+
+-Run by node S6Q1.js
+
+-Use postman.
+ POST http://localhost:3000/products
+
+-Body (JSON).
+ {
+  "name": "Laptop",
+  "price": 50000
+ }
+
+-GET http://localhost:3000/products/1
+
+
+Q.2) Find a company with a workforce greater than 30 in the array. (Using find by id method).
+-Same as Slip 3 Q2.
+
+
+
+
+Slip 7
+
+Q.1) Create a Node.js application that reads data from multiple files asynchronously using promises and async/await.
+-Same as Slip 1 Q2.
+
+
+Q.2) Develop an Express.js application that defines routes for Create and Read operations on a resource (User). (POSTMAN)
+
+-Create a new folder name as S7Q2.
+
+-npm init -y
+-npm install express body-parser
+
+1. s7q1.js
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const PORT = 3001;
+
+app.use(bodyParser.json());
+
+// In-memory user store
+let users = [];
+
+// CREATE: Add a new user
+app.post('/users', (req, res) => {
+  const { name, email } = req.body;
+  if (!name || !email) {
+    return res.status(400).json({ error: 'Name and email are required.' });
+  }
+
+  const newUser = {
+    id: users.length + 1,
+    name,
+    email
+  };
+
+  users.push(newUser);
+  res.status(201).json({ message: 'User created', user: newUser });
+});
+
+// READ: Get all users
+app.get('/users', (req, res) => {
+  res.json(users);
+});
+
+// READ: Get a user by ID
+app.get('/users/:id', (req, res) => {
+  const userId = parseInt(req.params.id);
+  const user = users.find(u => u.id === userId);
+
+  if (!user) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
+
+  res.json(user);
+});
+
+app.listen(PORT, () => {
+  console.log(`User service running at http://localhost:${PORT}`);
+});
+
+-Run by node s7q2.js
+
+-POST http://localhost:3001/users
+
+-Body JSON.
+ {
+  "name": "Pratik",
+  "email": "pratik@gmail.com"
+ }
+
+-GET http://localhost:3001/users/1
+
+
+
+
+Slip 8
+
+Q.1) Create a simple Angular application that fetches data from an API using HttpClient.Implement an Observable to fetch data from an API endpoint.
+-Same as Slip 2 Q2.
+
+
+Q.2) Develop an Express.js application that defines routes for Create, Update operationson a resource (Employee). (POSTMAN)
+-Same as Slip 6 Q1.
+
+-Create a new folder name as S8Q2.
+
+-npm init -y
+-npm install express body-parser
+
+1. s8q2.js
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const PORT = 3002;
+
+app.use(bodyParser.json());
+
+// In-memory employee store
+let employees = [];
+
+// CREATE: Add a new employee
+app.post('/employees', (req, res) => {
+  const { name, salary } = req.body;
+  if (!name || !salary) {
+    return res.status(400).json({ error: 'Name and salary are required.' });
+  }
+
+  const newEmployee = {
+    id: employees.length + 1,
+    name,
+    salary
+  };
+
+  employees.push(newEmployee);
+  res.status(201).json({ message: 'Employee created', employee: newEmployee });
+});
+
+// READ: Get all employees
+app.get('/employees', (req, res) => {
+  res.json(employees);
+});
+
+// READ: Get an employee by ID
+app.get('/employees/:id', (req, res) => {
+  const empId = parseInt(req.params.id);
+  const emp = employees.find(e => e.id === empId);
+
+  if (!emp) {
+    return res.status(404).json({ error: 'Employee not found.' });
+  }
+
+  res.json(emp);
+});
+
+app.listen(PORT, () => {
+  console.log(`Employee service running at http://localhost:${PORT}`);
+});
+
+-Run by node s8q2.js
+
+-POST http://localhost:3002/employees
+
+-Body JSON.
+ {
+  "name": "Amit",
+  "salary": 25000
+ }
+
+-GET http://localhost:3002/employees/1
+
+
+
+
+Slip 9
+
+Q.1) Find a company with a workforce greater than 30 in the array. (Using find by id method).
+-Same as Slip 3 Q2.
+
+
+Q.2) Create Express.js application to include middleware for parsing request bodies (e.g., JSON, form data) and validating input data. Send appropriate JSON responses for success and error cases. (Use POSTMAN If Needed)
+
+-Create a new folder name as S9Q2.
+
+-npm init -y
+-npm install express body-parser express-validator
+
+1. s9q2.js
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const { body, validationResult } = require('express-validator');
+
+const app = express();
+const PORT = 3000;
+
+// Middleware to parse JSON and form data
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// POST /register — Validate and process user input
+app.post(
+  '/register',
+  [
+    body('username')
+      .isLength({ min: 3 })
+      .withMessage('Username must be at least 3 characters'),
+
+    body('email')
+      .isEmail()
+      .withMessage('Invalid email address'),
+
+    body('age')
+      .isInt({ min: 1 })
+      .withMessage('Age must be a positive number')
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+
+    // If validation fails
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array()
+      });
+    }
+
+    // Extract valid data
+    const { username, email, age } = req.body;
+
+    res.status(200).json({
+      success: true,
+      message: 'User registered successfully',
+      data: { username, email, age }
+    });
+  }
+);
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
+
+-Run by node s9q2.js
+
+-POST http://localhost:3000/register
+
+-Body JSON
+ {
+  "username": "Prathik",
+  "email": "prathik@gmail.com",
+  "age": 22
+ }
+
+-GET http://localhost:3000/register/1
+
+
+
+
+Slip 10
+
+Q.1) Implement a simple server using Node.js.
+-Same as Slip 5 Q2.
+
+
+Q.2) Extend the previous Express.js application to include middleware for parsing request bodies (e.g., JSON, form data) and validating input data. Send appropriate JSON responses for success and error cases. (POSTMAN)
+
+-Create a new folder name as S10Q2.
+
+-npm init -y
+-npm install express body-parser express-validator
+
+1. s10q2.js
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const { body, validationResult } = require('express-validator');
+
+const app = express();
+const PORT = 3000;
+
+// Middleware to parse JSON and form data
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// POST /register — Validate and process user input
+app.post(
+  '/register',
+  [
+    body('username')
+      .isLength({ min: 3 })
+      .withMessage('Username must be at least 3 characters'),
+
+    body('email')
+      .isEmail()
+      .withMessage('Invalid email address'),
+
+    body('age')
+      .isInt({ min: 1 })
+      .withMessage('Age must be a positive number')
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+
+    // If validation fails
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array()
+      });
+    }
+
+    // Extract valid data
+    const { username, email, age } = req.body;
+
+    res.status(200).json({
+      success: true,
+      message: 'User registered successfully',
+      data: { username, email, age }
+    });
+  }
+);
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
+
+-Run by node s10q2.js
+
+-POST http://localhost:3000/register
+
+-Body JSON.
+ {
+  "username": "prathik",
+  "email": "prathik@test.com",
+  "age": 21
+ }
+
+-GET http://localhost:3000/register/1
+
+
+
+
+Slip 11
+
+Q.1) Develop an Express.js application that defines routes for Create operations on a resource (Movie). (POSTMAN)
+
+-Create a new folder name as S11Q2.
+
+-npm init -y
+-npm install express body-parser express-validator
+
+1. s11q1.js
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const PORT = 3003;
+
+app.use(bodyParser.json());
+
+// In-memory movie store
+let movies = [];
+
+// CREATE: Add a new movie
+app.post('/movies', (req, res) => {
+  const { title, rating } = req.body;
+  if (!title || !rating) {
+    return res.status(400).json({ error: 'Title and rating are required.' });
+  }
+
+  const newMovie = {
+    id: movies.length + 1,
+    title,
+    rating
+  };
+
+  movies.push(newMovie);
+  res.status(201).json({ message: 'Movie created', movie: newMovie });
+});
+
+// READ: Get all movies
+app.get('/movies', (req, res) => {
+  res.json(movies);
+});
+
+// READ: Get a movie by ID
+app.get('/movies/:id', (req, res) => {
+  const movieId = parseInt(req.params.id);
+  const movie = movies.find(m => m.id === movieId);
+
+  if (!movie) {
+    return res.status(404).json({ error: 'Movie not found.' });
+  }
+
+  res.json(movie);
+});
+
+app.listen(PORT, () => {
+  console.log(`Movie service running at http://localhost:${PORT}`);
+});
+
+-Run by node s11q2.js
+
+-POST http://localhost:3003/movies
+
+-Body JSON.
+ {
+  "title": "Avengers",
+  "rating": 9.2
+ }
+
+-GET http://localhost:3003/movies/1
+
+
+Q.2) Create Angular application that print the name of students who play basketball using filter and map method.
+
+-Create a new folder name as S11Q2.
+
+-ng new sports-app
+-cd sports-app
+-ng generate component basketball-players
+
+1. basketball-players.component.ts
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-basketball-players',
+  templateUrl: './basketball-players.component.html'
+})
+export class BasketballPlayersComponent implements OnInit {
+
+  students = [
+    { name: 'Aarav', sport: 'cricket' },
+    { name: 'Isha', sport: 'basketball' },
+    { name: 'Rohan', sport: 'football' },
+    { name: 'Sneha', sport: 'basketball' },
+    { name: 'Kabir', sport: 'tennis' }
+  ];
+
+  basketballPlayers: string[] = [];
+
+  ngOnInit() {
+    // Step 1: filter students who play basketball
+    // Step 2: extract their names
+    this.basketballPlayers = this.students
+      .filter(student => student.sport === 'basketball')
+      .map(student => student.name);
+  }
+}
+
+2. basketball-players.component.html
+
+<h2>Basketball Players</h2>
+
+<ul>
+  <li *ngFor="let player of basketballPlayers">
+    {{ player }}
+  </li>
+</ul>
+
+3. app.component.html
+
+<app-basketball-players></app-basketball-players>
+
+-Run by ng serve
+
+
+
+
+Slip 12
+
+Q.1) Write an AngularJS script to print details of Employee (employee name, employee Id,Pin code, address etc.) in tabular form using ng-repeat.
+
+1. s12q1.html
+
+<!DOCTYPE html>
+<html ng-app="EmployeeApp">
+<head>
+<title>Employee Details</title>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+<body ng-controller="EmployeeController" ng-init="loadEmployees()">
+<h2>Employee Directory</h2>
+
+<table border="1" cellpadding="8" cellspacing="0">
+<thead>
+<tr>
+<th>Employee Name</th>
+<th>Employee ID</th>
+<th>Pin Code</th>
+<th>Address</th>
+</tr>
+</thead>
+<tbody>
+<tr ng-repeat="emp in employees">
+<td>{{ emp.name }}</td>
+<td>{{ emp.id }}</td>
+<td>{{ emp.pin }}</td>
+<td>{{ emp.address }}</td>
+</tr>
+</tbody>
+</table>
+
+<script>
+angular.module('EmployeeApp', [])
+.controller('EmployeeController', function($scope) {
+    $scope.loadEmployees = function() {
+        $scope.employees = [
+            { name: 'Amit Sharma', id: 'E101', pin: '411001', address: 'Pune, Maharashtra' },
+            { name: 'Neha Verma', id: 'E102', pin: '110011', address: 'Delhi, India' },
+            { name: 'Ravi Kumar', id: 'E103', pin: '560001', address: 'Bangalore, Karnataka' },
+            { name: 'Sneha Joshi', id: 'E104', pin: '400001', address: 'Mumbai, Maharashtra' }
+        ];
+    };
+});
+</script>
+
+</body>
+</html>
+
+-Run by go live.
+
+
+Q.2) Develop an Express.js application that defines routes for Create operations on a resource (User). (POSTMAN)
+-Same as Slip 7 Q2.
+
+
+
+
+Slip 13
+
+Q.1) Extend the previous Express.js application to include middleware for parsing request bodies (e.g., JSON, form data) and validating input data. Send appropriate JSON responses for success and error cases.
+-Same as Slip 5 Q2.
+
+
+Q.2) Create a simple Angular component that takes input data and displays it.
+-Same as Slip 5 Q1.
+
+
+
+
+Slip 14
+
+Q.1) Create Angular application that print the name of students who got 85% using filter and map method.
+
+-Create a new folder name as S14Q1.
+
+-ng new top-scorers-app
+-cd top-scorers-app
+-ng generate component top-scorers
+
+1. top-scorers.component.ts
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-top-scorers',
+  templateUrl: './top-scorers.component.html',
+  styleUrls: ['./top-scorers.component.css']
+})
+export class TopScorersComponent implements OnInit {
+
+  students = [
+    { name: 'Aarav', percentage: 78 },
+    { name: 'Isha', percentage: 85 },
+    { name: 'Rohan', percentage: 92 },
+    { name: 'Sneha', percentage: 85 },
+    { name: 'Kabir', percentage: 80 }
+  ];
+
+  topScorers: string[] = [];
+
+  ngOnInit(): void {
+    // filter for students with percentage === 85, then extract names
+    this.topScorers = this.students
+      .filter(student => student.percentage === 85)
+      .map(student => student.name);
+  }
+}
+
+2. top-scorers.component.html
+
+<h2>Students Who Scored 85%</h2>
+
+<ul>
+  <li *ngFor="let name of topScorers">
+    {{ name }}
+  </li>
+</ul>
+
+<!-- Optional: show message if none -->
+<p *ngIf="topScorers.length === 0">No students scored exactly 85%.</p>
+
+3. app.module.ts
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+
+import { AppComponent } from './app.component';
+import { TopScorersComponent } from './top-scorers/top-scorers.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    TopScorersComponent
+  ],
+  imports: [
+    BrowserModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+4. app.component.html
+
+<h1>Top Scorers Demo</h1>
+
+<app-top-scorers></app-top-scorers>
+
+-Run by ng serve
+
+
+Q.2) Develop an Express.js application that defines routes for Create, Update operations on a resource (Employee). (POSTMAN)
+-Same as Slip 8 Q2.
+
+
+
+
+Slip 15
+
+Q.1) Find an emp with a Salary greater than 25000 in the array. (Using find by id method).
+
+1. s15q1.js
+
+// Define an array of employee objects
+const employees = [
+    { id: 101, name: 'Amit', salary: 24000 },
+    { id: 102, name: 'Neha', salary: 26000 },
+    { id: 103, name: 'Ravi', salary: 28000 },
+    { id: 104, name: 'Sneha', salary: 22000 }
+];
+
+// Find the first employee with salary > 25000
+const highEarner = employees.find(emp => emp.salary > 25000);
+
+// Display the result
+if (highEarner) {
+    console.log(`Employee Found:
+Name: ${highEarner.name}
+ID: ${highEarner.id}
+Salary: ₹${highEarner.salary}`);
+} else {
+    console.log('No employee found with salary greater than ₹25,000.');
+}
+
+-Run by node s15q1.js
+
+
+Q.2) Create Angular application that print the name of students who got 85% using filter and map method.
+-Same as Slip 14 Q1.
